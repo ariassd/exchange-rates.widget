@@ -1,16 +1,5 @@
-// This is a simple example Widget to get you started with Übersicht.
-// For the full documentation please visit:
-// https://github.com/felixhageloh/uebersicht
+import { run } from "uebersicht";
 
-// You can modify this widget as you see fit, or simply delete this file to
-// remove it.
-
-// this is the shell command that gets executed every time this widget refreshes
-// export const command = "whoami";
-// const refreshFrequency = 1000;
-
-// the CSS style for this widget, written using Emotion
-// https://emotion.sh/
 export const className = `
   position: fixed;
   bottom: 0;
@@ -22,7 +11,7 @@ export const className = `
   background-color: rgba(255, 255, 255, 0.4);
   -webkit-backdrop-filter: blur(20px);
   color: #efefef;
-  font-family: Helvetica Neue;
+  font-family: 'Comfortaa','Skyhook Mono', 'Monoxil', Helvetica Neue;
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 13px;
   text-align: justify;
@@ -30,7 +19,7 @@ export const className = `
   
 
   h1 {
-    font-size: 20px;
+    font-size: 10px;
     margin: 0 0 0 4px;
   }
 
@@ -39,15 +28,39 @@ export const className = `
   }
 
   .title {
+    font-size: 10px;
     width: 50px
+    text-align: right;
   }
 
-  .text-left {
+  .ex-value {
     text-align: left;
+    font-weight: bold;
+    font-color: #fff
+  }
+
+  .ex-date {
+    font-size: 15px;
+    text-align: left;
+    font-weight: bold;
+    font-color: #fff
+  }
+
+  .vertical-splitter {
+    font-size: 25px;
   }
 
   .logo {
     width: 40px;
+  }
+
+  .credits {
+    position: fixed;
+    font-size: 8px;
+    bottom: 3px;
+    left:400px;
+    font-family: 'Skyhook';
+    color: #c3c3c3
   }
 
   em {
@@ -73,31 +86,36 @@ export const render = ({ output, error }) => {
             <img
               className="logo"
               src="/exchange-rates.widget/assets/coopenae-tiny.png"
+              onClick={() => {
+                run(
+                  "open -a Google\\ Chrome.app https://www.coopenaevirtual.fi.cr/Coopenae"
+                );
+              }}
             />
           </td>
-          <td className="title">
-            <h1>Sell:</h1>
-          </td>
+          <td className="title">Sell:</td>
           <td>
-            <span className="text-left">{exchange?.sell}</span>
+            <span className="ex-value">{exchange?.sell}</span>
           </td>
-          <td className="title">
-            <h1>Buy:</h1>
-          </td>
-          <td>{exchange?.buy}</td>
-          <td className="title">
-            <h1>Date:</h1>
-          </td>
+          <td className="vertical-splitter">|</td>
+          <td className="title">Buy:</td>
           <td>
-            {new Date(exchange?.date).toLocaleTimeString("en-US", {
-              month: "short",
-              day: "2-digit",
-              hour: "2-digit",
-              minute: "2-digit",
-            })}
+            <span className="ex-value">{exchange?.buy}</span>
+          </td>
+          <td className="title">Date:</td>
+          <td>
+            <span className="ex-date">
+              {new Date(exchange?.date).toLocaleTimeString("en-US", {
+                month: "short",
+                day: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </span>
           </td>
         </tr>
       </table>
+      <div className="credits"> exchange-rates @2022</div>
     </div>
   );
 };
