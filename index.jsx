@@ -77,7 +77,7 @@ export const className = `
   }
 `;
 
-export const command = `exchange-rates --ex=coopenae`;
+export const command = `exchange-rates --ex=bcr`;
 // the refresh frequency in milliseconds
 export const refreshFrequency = 300000;
 
@@ -86,7 +86,8 @@ export const refreshFrequency = 300000;
 export const render = ({ output, error }) => {
   let exchange = { statusCode: 0 };
   try {
-    exchange = JSON.parse(output).find((i) => i.exchangeCode === "0814");
+    exchange = JSON.parse(output)[0];
+    console.log(exchange);
   } catch (ex) {}
   console.log(exchange);
   return (
@@ -95,10 +96,10 @@ export const render = ({ output, error }) => {
         <div className="offline">
           <img
             className="logo"
-            src="/exchange-rates.widget/assets/coopenae-tiny.png"
+            src="/exchange-rates.widget/assets/bcr.png"
             onClick={() => {
               run(
-                "open -a Google\\ Chrome.app https://www.coopenaevirtual.fi.cr/Coopenae"
+                "open -a Google\\ Chrome.app https://www.personas.bancobcr.com/plantilla/index.asp"
               );
             }}
           />
@@ -111,10 +112,10 @@ export const render = ({ output, error }) => {
             <td>
               <img
                 className="logo"
-                src="/exchange-rates.widget/assets/coopenae-tiny.png"
+                src="/exchange-rates.widget/assets/bcr.png"
                 onClick={() => {
                   run(
-                    "open -a Google\\ Chrome.app https://www.coopenaevirtual.fi.cr/Coopenae"
+                    "open -a Google\\ Chrome.app https://www.personas.bancobcr.com/plantilla/index.asp"
                   );
                 }}
               />
