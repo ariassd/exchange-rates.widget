@@ -1,4 +1,5 @@
 import { run } from "uebersicht";
+import { BankTransformation } from "./bankTransformation";
 
 export const className = `
   position: fixed;
@@ -77,23 +78,23 @@ export const className = `
   }
 `;
 
-// export const command = `exchange-rates --ex=bcr`;
-// export const command = `curl `;
+const Bank = BankTransformation.banks.find(
+  (i) => i.name === BankTransformation.show
+);
+
 // the refresh frequency in milliseconds
 export const refreshFrequency = 300000;
-
 const builtInProxy = "http://127.0.0.1:41417/";
-const remoteUrl =
-  "https://www.vista360coopenae.fi.cr/TreasuryAPI/api/ExchangeRate?operatorCode=0&countryCode=CR&channelCode=WB&currencyCode=COL&type=1";
+
 export const command = (dispatch) =>
-  fetch(`${builtInProxy}${remoteUrl}`)
+  fetch(`${builtInProxy}${Bank.url}`)
     .then((response) => {
       response.json().then((data) => {
         const result = {
           statusCode: 200,
-          buy: +data.buyRate,
-          sell: +data.sellRate,
-          date: new Date(),
+          buy: Bank.transformation.buyRate(data),
+          sell: Bank.transformation.sellRate(data),
+          date: Bank.transformation.date(data),
         };
         dispatch({
           type: "FETCH_SUCCEDED",
@@ -127,7 +128,7 @@ export const render = ({ data }) => {
         <div className="offline">
           <img
             className="logo"
-            src="/exchange-rates.widget/assets/coopenae.png"
+            src={Bank.pict}
             onClick={() => {
               run(
                 "open -a Google\\ Chrome.app https://www.personas.bancobcr.com/plantilla/index.asp"
@@ -144,7 +145,7 @@ export const render = ({ data }) => {
               <td>
                 <img
                   className="logo"
-                  src="/exchange-rates.widget/assets/coopenae.png"
+                  src={Bank.pict}
                   onClick={() => {
                     run(
                       "open -a Google\\ Chrome.app https://www.personas.bancobcr.com/plantilla/index.asp"
