@@ -51,7 +51,7 @@ export const className = `
   }
 
   .logo {
-    width: 40px;
+    width: 35px;
     float: left;
   }
 
@@ -77,22 +77,53 @@ export const className = `
   }
 `;
 
-export const command = `exchange-rates --ex=bcr`;
+// export const command = `exchange-rates --ex=bcr`;
+// export const command = `curl `;
 // the refresh frequency in milliseconds
 export const refreshFrequency = 300000;
 
+const builtInProxy = "http://127.0.0.1:41417/";
+const remoteUrl =
+  "https://www.bancobcr.com/wps/proxy/http/bcrrestgen-app:24000/rest/api/v1/bcr-informativo/tipo-cambio/obtener/dolares";
+export const command = (dispatch) =>
+  fetch(`${builtInProxy}${remoteUrl}`)
+    .then((response) => {
+      response.json().then((data) => {
+        const result = {
+          statusCode: 200,
+          buy: +data.compra.substring(0, 6),
+          sell: +data.venta.substring(0, 6),
+          date: new Date(),
+        };
+        dispatch({
+          type: "FETCH_SUCCEDED",
+          data: result,
+        });
+      });
+    })
+    .catch((error) => {
+      dispatch({ type: "FETCH_FAILED", error: error });
+    });
+
+export const updateState = (event, previousState) => {
+  switch (event.type) {
+    case "FETCH_SUCCEDED":
+      // set a new state called data
+      return { ...previousState, data: event.data };
+    case "FETCH_FAILED":
+      return { ...previousState, data: event.data };
+    default: {
+      return previousState;
+    }
+  }
+};
+
 // render gets called after the shell command has executed. The command's output
 // is passed in as a string.
-export const render = ({ output, error }) => {
-  let exchange = { statusCode: 0 };
-  try {
-    exchange = JSON.parse(output)[0];
-    console.log(exchange);
-  } catch (ex) {}
-  console.log(exchange);
+export const render = ({ data }) => {
   return (
     <div>
-      {exchange.statusCode !== 200 && (
+      {data?.statusCode !== 200 && (
         <div className="offline">
           <img
             className="logo"
@@ -106,41 +137,43 @@ export const render = ({ output, error }) => {
           <span>Offline </span>
         </div>
       )}
-      {exchange.statusCode === 200 && (
+      {data?.statusCode === 200 && (
         <table className="table-container">
-          <tr>
-            <td>
-              <img
-                className="logo"
-                src="/exchange-rates.widget/assets/bcr.png"
-                onClick={() => {
-                  run(
-                    "open -a Google\\ Chrome.app https://www.personas.bancobcr.com/plantilla/index.asp"
-                  );
-                }}
-              />
-            </td>
-            <td className="title">Sell:</td>
-            <td>
-              <span className="ex-value">{exchange?.sell}</span>
-            </td>
-            <td className="vertical-splitter">|</td>
-            <td className="title">Buy:</td>
-            <td>
-              <span className="ex-value">{exchange?.buy}</span>
-            </td>
-            <td className="title"></td>
-            <td>
-              <span className="ex-date">
-                {new Date(exchange?.date).toLocaleTimeString("en-US", {
-                  month: "short",
-                  day: "2-digit",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              </span>
-            </td>
-          </tr>
+          <tbody>
+            <tr>
+              <td>
+                <img
+                  className="logo"
+                  src="/exchange-rates.widget/assets/bcr.png"
+                  onClick={() => {
+                    run(
+                      "open -a Google\\ Chrome.app https://www.personas.bancobcr.com/plantilla/index.asp"
+                    );
+                  }}
+                />
+              </td>
+              <td className="title">Sell:</td>
+              <td>
+                <span className="ex-value">{data?.sell}</span>
+              </td>
+              <td className="vertical-splitter">|</td>
+              <td className="title">Buy:</td>
+              <td>
+                <span className="ex-value">{data?.buy}</span>
+              </td>
+              <td className="title"></td>
+              <td>
+                <span className="ex-date">
+                  {new Date(data?.date).toLocaleTimeString("en-US", {
+                    month: "short",
+                    day: "2-digit",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </span>
+              </td>
+            </tr>
+          </tbody>
         </table>
       )}
       <div className="credits"> exchange-rates @2022</div>
