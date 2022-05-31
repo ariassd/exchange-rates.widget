@@ -84,15 +84,15 @@ export const refreshFrequency = 300000;
 
 const builtInProxy = "http://127.0.0.1:41417/";
 const remoteUrl =
-  "https://www.bancobcr.com/wps/proxy/http/bcrrestgen-app:24000/rest/api/v1/bcr-informativo/tipo-cambio/obtener/dolares";
+  "https://www.vista360coopenae.fi.cr/TreasuryAPI/api/ExchangeRate?operatorCode=0&countryCode=CR&channelCode=WB&currencyCode=COL&type=1";
 export const command = (dispatch) =>
   fetch(`${builtInProxy}${remoteUrl}`)
     .then((response) => {
       response.json().then((data) => {
         const result = {
           statusCode: 200,
-          buy: +data.compra.substring(0, 6),
-          sell: +data.venta.substring(0, 6),
+          buy: +data.buyRate,
+          sell: +data.sellRate,
           date: new Date(),
         };
         dispatch({
@@ -127,7 +127,7 @@ export const render = ({ data }) => {
         <div className="offline">
           <img
             className="logo"
-            src="/exchange-rates.widget/assets/bcr.png"
+            src="/exchange-rates.widget/assets/coopenae.png"
             onClick={() => {
               run(
                 "open -a Google\\ Chrome.app https://www.personas.bancobcr.com/plantilla/index.asp"
@@ -144,7 +144,7 @@ export const render = ({ data }) => {
               <td>
                 <img
                   className="logo"
-                  src="/exchange-rates.widget/assets/bcr.png"
+                  src="/exchange-rates.widget/assets/coopenae.png"
                   onClick={() => {
                     run(
                       "open -a Google\\ Chrome.app https://www.personas.bancobcr.com/plantilla/index.asp"
