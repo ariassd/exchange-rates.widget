@@ -1,11 +1,9 @@
 # Exchange rates
 
-# Install global
+# Install the widget
 
 - install http://tracesof.net/uebersicht/
-- install https://github.com/ariassd/exchange-rates
 - Download the widget and copy in the Übersicht widgets folder
-- Activate Shell commands load bash env
 
 # Usage
 
