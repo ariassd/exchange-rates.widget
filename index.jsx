@@ -130,9 +130,7 @@ export const render = ({ data }) => {
             className="logo"
             src={Bank.pict}
             onClick={() => {
-              run(
-                "open -a Google\\ Chrome.app https://www.personas.bancobcr.com/plantilla/index.asp"
-              );
+              run(`open -a Google\\ Chrome.app ${Bank.web}`);
             }}
           />
           <span>Offline </span>
@@ -147,9 +145,7 @@ export const render = ({ data }) => {
                   className="logo"
                   src={Bank.pict}
                   onClick={() => {
-                    run(
-                      "open -a Google\\ Chrome.app https://www.personas.bancobcr.com/plantilla/index.asp"
-                    );
+                    run(`open -a Google\\ Chrome.app ${Bank.web}`);
                   }}
                 />
               </td>

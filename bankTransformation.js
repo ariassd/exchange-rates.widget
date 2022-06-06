@@ -5,6 +5,7 @@ export const BankTransformation = {
       name: "coopenae",
       pict: "/exchange-rates.widget/assets/coopenae.png",
       url: "https://www.vista360coopenae.fi.cr/TreasuryAPI/api/ExchangeRate?operatorCode=0&countryCode=CR&channelCode=WB&currencyCode=COL&type=1",
+      web: "https://www.coopenaevirtual.fi.cr/Coopenae",
       transformation: {
         buyRate: (data) => +data.buyRate,
         sellRate: (data) => +data.sellRate,
@@ -15,6 +16,7 @@ export const BankTransformation = {
       name: "bcr",
       pict: "/exchange-rates.widget/assets/bcr.png",
       url: "https://www.bancobcr.com/wps/proxy/http/bcrrestgen-app:24000/rest/api/v1/bcr-informativo/tipo-cambio/obtener/dolares",
+      web: "https://www.personas.bancobcr.com/plantilla/index.asp",
       transformation: {
         buyRate: (data) => +data.compra.substring(0, 6),
         sellRate: (data) => +data.venta.substring(0, 6),
@@ -25,6 +27,7 @@ export const BankTransformation = {
       name: "bct",
       pict: "/exchange-rates.widget/assets/bct.png",
       url: "https://app001.corporacionbct.com/Tailored.ICBanking.WebApi/api/framework/common/exchangeRates",
+      web: "https://enlacebct.com",
       transformation: {
         buyRate: (data) => +data[0].buyRate,
         sellRate: (data) => +data[0].sellRate,
