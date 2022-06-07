@@ -1,8 +1,15 @@
+import { React } from "uebersicht";
 import { run } from "uebersicht";
 import { About } from "./about.jsx";
 import { Config } from "../config";
 
-const Exchange = ({ data, bank }) => {
+const Exchange = ({ data, bank, onBankChange }) => {
+  const [selectedBank, setSelectedBank] = React.useState("");
+  const handleChange = (e) => {
+    setSelectedBank(e.target.value);
+    onBankChange(e.target.value);
+  };
+
   return (
     <div>
       {data?.statusCode !== 200 && (
@@ -29,6 +36,21 @@ const Exchange = ({ data, bank }) => {
                     run(`${Config.defaultBrowser} ${bank.web}`);
                   }}
                 />
+                {true && (
+                  <select onChange={(e) => handleChange(e)}>
+                    {Config.banks.map((i) => {
+                      return (
+                        <option
+                          key={i.name}
+                          value={i.name}
+                          defaultValue={bank.name}
+                        >
+                          {i.shortName}
+                        </option>
+                      );
+                    })}
+                  </select>
+                )}
               </td>
               <td className="title">Sell:</td>
               <td>

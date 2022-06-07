@@ -1,9 +1,10 @@
 export const Config = {
-  show: "bac",
+  show: "coopenae",
   defaultBrowser: "open -a Google\\ Chrome.app",
   banks: [
     {
       name: "coopenae",
+      shortName: "cn",
       bankCode: 814,
       pict: "/exchange-rates.widget/assets/coopenae.png",
       url: "https://www.vista360coopenae.fi.cr/TreasuryAPI/api/ExchangeRate?operatorCode=0&countryCode=CR&channelCode=WB&currencyCode=COL&type=1",
@@ -16,6 +17,7 @@ export const Config = {
     },
     {
       name: "bcr",
+      shortName: "bcr",
       bankCode: 152,
       pict: "/exchange-rates.widget/assets/bcr.png",
       url: "https://www.bancobcr.com/wps/proxy/http/bcrrestgen-app:24000/rest/api/v1/bcr-informativo/tipo-cambio/obtener/dolares",
@@ -28,6 +30,7 @@ export const Config = {
     },
     {
       name: "bct",
+      shortName: "bct",
       bankCode: 107,
       pict: "/exchange-rates.widget/assets/bct.png",
       url: "https://app001.corporacionbct.com/Tailored.ICBanking.WebApi/api/framework/common/exchangeRates",
@@ -40,6 +43,7 @@ export const Config = {
     },
     {
       name: "bac",
+      shortName: "bac",
       bankCode: 102,
       pict: "/exchange-rates.widget/assets/bac.png",
       url: "https://www.sucursalelectronica.com/exchangerate/showXmlExchangeRate.do",
