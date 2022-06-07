@@ -25,7 +25,7 @@ Any bank with public api rest to get the exchange
 
 ## Configuration
 
-Open the file named `bankTransformation.js` and select in the field `show` the bank exchange date you want to show.
+Open the file named `src/config.js` and select in the field `show` the bank exchange date you want to show.
 
 ## Adding more banks
 
@@ -42,6 +42,7 @@ To add other banks
       name: "coopenae",
       pict: "/exchange-rates.widget/assets/coopenae.png",
       url: "https://www.vista360coopenae.fi.cr/TreasuryAPI/api/ExchangeRate?operatorCode=0&countryCode=CR&channelCode=WB&currencyCode=COL&type=1",
+      isXml: false,
       transformation: {
         buyRate: (data) => +data.buyRate,
         sellRate: (data) => +data.sellRate,

@@ -1,5 +1,7 @@
-import { run } from "uebersicht";
-import { BankTransformation } from "./bankTransformation";
+import { Exchange } from "./src/pages/exchange.jsx";
+import { Config } from "./src/config";
+
+const Bank = Config.banks.find((i) => i.name === Config.show);
 
 export const className = `
   position: fixed;
@@ -78,10 +80,6 @@ export const className = `
   }
 `;
 
-const Bank = BankTransformation.banks.find(
-  (i) => i.name === BankTransformation.show
-);
-
 // the refresh frequency in milliseconds
 export const refreshFrequency = 300000;
 const builtInProxy = "http://127.0.0.1:41417/";
@@ -89,18 +87,38 @@ const builtInProxy = "http://127.0.0.1:41417/";
 export const command = (dispatch) =>
   fetch(`${builtInProxy}${Bank.url}`)
     .then((response) => {
-      response.json().then((data) => {
-        const result = {
-          statusCode: 200,
-          buy: Bank.transformation.buyRate(data),
-          sell: Bank.transformation.sellRate(data),
-          date: Bank.transformation.date(data),
-        };
-        dispatch({
-          type: "FETCH_SUCCEDED",
-          data: result,
+      if (Bank.isXml === true) {
+        response
+          .text((response) => response.text())
+          .then((str) =>
+            new window.DOMParser().parseFromString(str, "text/xml")
+          )
+          .then((data) => {
+            const result = {
+              statusCode: 200,
+              buy: Bank.transformation.buyRate(data),
+              sell: Bank.transformation.sellRate(data),
+              date: Bank.transformation.date(data),
+            };
+            dispatch({
+              type: "FETCH_SUCCEDED",
+              data: result,
+            });
+          });
+      } else {
+        response.json().then((data) => {
+          const result = {
+            statusCode: 200,
+            buy: Bank.transformation.buyRate(data),
+            sell: Bank.transformation.sellRate(data),
+            date: Bank.transformation.date(data),
+          };
+          dispatch({
+            type: "FETCH_SUCCEDED",
+            data: result,
+          });
         });
-      });
+      }
     })
     .catch((error) => {
       dispatch({ type: "FETCH_FAILED", error: error });
@@ -122,58 +140,5 @@ export const updateState = (event, previousState) => {
 // render gets called after the shell command has executed. The command's output
 // is passed in as a string.
 export const render = ({ data }) => {
-  return (
-    <div>
-      {data?.statusCode !== 200 && (
-        <div className="offline">
-          <img
-            className="logo"
-            src={Bank.pict}
-            onClick={() => {
-              run(`open -a Google\\ Chrome.app ${Bank.web}`);
-            }}
-          />
-          <span>Offline </span>
-        </div>
-      )}
-      {data?.statusCode === 200 && (
-        <table className="table-container">
-          <tbody>
-            <tr>
-              <td>
-                <img
-                  className="logo"
-                  src={Bank.pict}
-                  onClick={() => {
-                    run(`open -a Google\\ Chrome.app ${Bank.web}`);
-                  }}
-                />
-              </td>
-              <td className="title">Sell:</td>
-              <td>
-                <span className="ex-value">{data?.sell}</span>
-              </td>
-              <td className="vertical-splitter">|</td>
-              <td className="title">Buy:</td>
-              <td>
-                <span className="ex-value">{data?.buy}</span>
-              </td>
-              <td className="title"></td>
-              <td>
-                <span className="ex-date">
-                  {new Date(data?.date).toLocaleTimeString("en-US", {
-                    month: "short",
-                    day: "2-digit",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      )}
-      <div className="credits"> exchange-rates @2022</div>
-    </div>
-  );
+  return <Exchange data={data} bank={Bank} />;
 };
