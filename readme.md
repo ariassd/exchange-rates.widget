@@ -37,13 +37,15 @@ To add other banks
 
 ```js
 {
-  show: "coopenae",
+  show: ["coopenae"],
   banks: [
     {
       name: "coopenae",
+      shortName: "cn",
+      bankCode: 814,
       pict: "/exchange-rates.widget/assets/coopenae.png",
       url: "https://www.vista360coopenae.fi.cr/TreasuryAPI/api/ExchangeRate?operatorCode=0&countryCode=CR&channelCode=WB&currencyCode=COL&type=1",
-      isXml: false,
+      web: "https://www.coopenaevirtual.fi.cr/Coopenae",
       transformation: {
         buyRate: (data) => +data.buyRate,
         sellRate: (data) => +data.sellRate,
