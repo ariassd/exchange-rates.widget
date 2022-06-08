@@ -79,7 +79,7 @@ export const className = `
   }
 `;
 
-var Bank = Config.banks.find((i) => i.name === Config.show);
+var Bank = Config.banks.find((i) => i.name === Config.show[0]);
 
 // the refresh frequency in milliseconds
 export const refreshFrequency = 300000;

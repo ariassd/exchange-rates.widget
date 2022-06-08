@@ -1,13 +1,15 @@
 import { React } from "uebersicht";
 import { run } from "uebersicht";
+
 import { About } from "./about.jsx";
+import { Dropdown } from "../components/dropdown.jsx";
 import { Config } from "../config";
 
 const Exchange = ({ data, bank, onBankChange }) => {
   const [selectedBank, setSelectedBank] = React.useState("");
   const handleChange = (e) => {
-    setSelectedBank(e.target.value);
-    onBankChange(e.target.value);
+    setSelectedBank(e.value);
+    onBankChange(e.value);
   };
 
   return (
@@ -29,6 +31,18 @@ const Exchange = ({ data, bank, onBankChange }) => {
           <tbody>
             <tr>
               <td>
+                {true && (
+                  <Dropdown
+                    items={Config.banks
+                      .filter((i) => Config.show.includes(i.name))
+                      .map((i) => ({
+                        id: i.name,
+                        value: i.name,
+                        image: i.pict,
+                      }))}
+                    onClick={(val) => handleChange(val)}
+                  />
+                )}
                 <img
                   className="logo"
                   src={bank.pict}
@@ -36,7 +50,8 @@ const Exchange = ({ data, bank, onBankChange }) => {
                     run(`${Config.defaultBrowser} ${bank.web}`);
                   }}
                 />
-                {true && (
+
+                {false && (
                   <select onChange={(e) => handleChange(e)}>
                     {Config.banks.map((i) => {
                       return (

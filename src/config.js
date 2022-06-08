@@ -1,5 +1,5 @@
 export const Config = {
-  show: "coopenae",
+  show: ["coopenae", "bct", "bac", "bcr"],
   defaultBrowser: "open -a Google\\ Chrome.app",
   banks: [
     {
