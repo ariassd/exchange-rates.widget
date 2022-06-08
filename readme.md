@@ -6,7 +6,7 @@ This widget allows you to show the exchange rates for different banks.
 
 #### Banks added
 
-BCR, BCT, Coopenae
+BCR, BCT, BAC, Coopenae
 
 #### Banks can be added
 
@@ -14,6 +14,7 @@ Any bank with public api rest to get the exchange
 
 ## Screenshots
 
+![](assets/bank-switch-screen.png)
 ![](assets/coopenae-screen.png)
 ![](assets/bct-screen.png)
 ![](assets/bcr-screen.png)

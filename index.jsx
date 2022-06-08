@@ -1,7 +1,6 @@
+import { React } from "uebersicht";
 import { Exchange } from "./src/pages/exchange.jsx";
 import { Config } from "./src/config";
-
-const Bank = Config.banks.find((i) => i.name === Config.show);
 
 export const className = `
   position: fixed;
@@ -80,11 +79,13 @@ export const className = `
   }
 `;
 
+var Bank = Config.banks.find((i) => i.name === Config.show[0]);
+
 // the refresh frequency in milliseconds
 export const refreshFrequency = 300000;
 const builtInProxy = "http://127.0.0.1:41417/";
 
-export const command = (dispatch) =>
+export const command = (dispatch) => {
   fetch(`${builtInProxy}${Bank.url}`)
     .then((response) => {
       if (Bank.isXml === true) {
@@ -123,11 +124,11 @@ export const command = (dispatch) =>
     .catch((error) => {
       dispatch({ type: "FETCH_FAILED", error: error });
     });
+};
 
 export const updateState = (event, previousState) => {
   switch (event.type) {
     case "FETCH_SUCCEDED":
-      // set a new state called data
       return { ...previousState, data: event.data };
     case "FETCH_FAILED":
       return { ...previousState, data: event.data };
@@ -137,8 +138,38 @@ export const updateState = (event, previousState) => {
   }
 };
 
-// render gets called after the shell command has executed. The command's output
-// is passed in as a string.
-export const render = ({ data }) => {
-  return <Exchange data={data} bank={Bank} />;
+const Main = (input) => {
+  const [selectedBank, setSelectedBank] = React.useState({});
+  const [data, setData] = React.useState();
+
+  React.useEffect(() => {
+    setSelectedBank(Bank);
+  }, []);
+  React.useEffect(() => {
+    command((data) => {
+      setData(data.data);
+    });
+  }, [selectedBank]);
+
+  React.useEffect(() => {
+    setData(input.data);
+  }, [input]);
+
+  const onBankChangeHandler = (bank) => {
+    Bank = Config.banks.find((i) => i.name === bank);
+    setSelectedBank(Bank);
+  };
+  return (
+    <Exchange
+      data={data}
+      bank={selectedBank}
+      onBankChange={onBankChangeHandler}
+    />
+  );
 };
+
+const render = ({ data }) => {
+  return <Main data={data} />;
+};
+
+export { render };
