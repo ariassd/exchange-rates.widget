@@ -86,6 +86,7 @@ export const refreshFrequency = 300000;
 const builtInProxy = "http://127.0.0.1:41417/";
 
 export const command = (dispatch) => {
+  console.log(new Date(), Bank.url);
   fetch(`${builtInProxy}${Bank.url}`)
     .then((response) => {
       if (Bank.isXml === true) {

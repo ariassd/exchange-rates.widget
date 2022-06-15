@@ -30,12 +30,14 @@ const dropdown = css({
 const dropdownContent = css({
   display: "none",
   position: "absolute",
-  bottom: "-10px",
+  bottom: "-23px",
   left: "15px",
+  height: "46px",
   backgroundColor: "rgba(255, 255, 255, 0.8)",
   borderRadius: "13px",
-  minWidth: "300px",
-  boxShadow: "0px 8px 16px 0px rgba(0,0,0,0.2)",
+  border: "solid 1px #fff",
+  minWidth: "320px",
+  boxShadow: "0px 8px 16px 0px rgba(0,0,0,0.7)",
   zIndex: 1,
   a: {
     color: "black",
