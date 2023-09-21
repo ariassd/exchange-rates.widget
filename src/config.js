@@ -1,5 +1,5 @@
 export const Config = {
-  show: ["coopenae", "bct", "bac", "bcr"],
+  show: ["bcr","coopenae","mutual", "bct", "bac" ],
   defaultBrowser: "open -a Google\\ Chrome.app",
   banks: [
     {
@@ -12,6 +12,19 @@ export const Config = {
       transformation: {
         buyRate: (data) => +data.buyRate,
         sellRate: (data) => +data.sellRate,
+        date: (data) => new Date(),
+      },
+    },
+    {
+      name: "mutual",
+      shortName: "mut",
+      bankCode: 814,
+      pict: "/exchange-rates.widget/assets/mutual.png",
+      url: "https://www2.gmapi.fi.cr/currency-exchange/currency-exchange-transaction-origination/",
+      web: "https://mutualenlinea.grupomutual.fi.cr/ingreso",
+      transformation: {
+        buyRate: (data) => +data.exchangeRateItem.ratePurchase,
+        sellRate: (data) => +data.exchangeRateItem.rateSale,
         date: (data) => new Date(),
       },
     },
@@ -75,5 +88,6 @@ export const Config = {
         date: (data) => new Date(),
       },
     },
+    
   ],
 };
