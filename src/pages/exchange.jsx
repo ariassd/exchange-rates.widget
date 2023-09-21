@@ -67,14 +67,14 @@ const Exchange = ({ data, bank, onBankChange }) => {
                   </select>
                 )}
               </td>
-              <td className="title">Sell:</td>
-              <td>
-                <span className="ex-value">{data?.sell}</span>
-              </td>
-              <td className="vertical-splitter">|</td>
               <td className="title">Buy:</td>
               <td>
                 <span className="ex-value">{data?.buy}</span>
+              </td>
+              <td className="vertical-splitter">|</td>
+              <td className="title">Sell:</td>
+              <td>
+                <span className="ex-value">{data?.sell}</span>
               </td>
               <td className="title"></td>
               <td>
