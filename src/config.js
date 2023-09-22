@@ -1,5 +1,5 @@
 export const Config = {
-  show: ["bcr","coopenae","mutual", "bct", "bac" ],
+  show: ["bcr","coopenae","mutual", "coopealianza", "bct", "bac" ],
   defaultBrowser: "open -a Google\\ Chrome.app",
   banks: [
     {
@@ -25,6 +25,19 @@ export const Config = {
       transformation: {
         buyRate: (data) => +data.exchangeRateItem.ratePurchase,
         sellRate: (data) => +data.exchangeRateItem.rateSale,
+        date: (data) => new Date(),
+      },
+    },
+    {
+      name: "coopealianza",
+      shortName: "mut",
+      bankCode: 814,
+      pict: "/exchange-rates.widget/assets/coopealianza.png",
+      url: "https://coopealianza.fi.cr/tipo-cambio/consulta_tc.php",
+      web: "https://web.coopealianza.fi.cr/Administration.WebUI/Pages/General/Login.aspx",
+      transformation: {
+        buyRate: (data) => +data.tc_compra,
+        sellRate: (data) => +data.tc_venta,
         date: (data) => new Date(),
       },
     },
