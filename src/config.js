@@ -1,7 +1,27 @@
 export const Config = {
-  show: ["coopenae","mutual", "coopealianza","bcr", "bct", "bac" ],
+  show: ["suap", "coopenae","mutual", "coopealianza","bcr", "bct", "bac" ],
   defaultBrowser: "open -a Google\\ Chrome.app",
   banks: [
+    {
+      name: "suap",
+      shortName: "sp",
+      bankCode: 1200,
+      pict: "/exchange-rates.widget/assets/suap.png",
+      url: "https://suap.cr",
+      web: "https://suap.cr",
+      isHtml: true,
+      transformation: {
+        buyRate: (data) => {
+          const buy = data.getElementById("tc-compra").innerHTML;
+          return +buy
+        },
+        sellRate: (data) => {
+          const sell = data.getElementById("tc-venta").innerHTML;
+          return +sell
+        },
+        date: (data) => new Date(),
+      },
+    },
     {
       name: "coopenae",
       shortName: "cn",

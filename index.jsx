@@ -10,9 +10,10 @@ export const className = `
   height: 48px;
   box-sizing: border-box;
   margin: 0 0 5px 10px;
-  background-color: rgba(255, 255, 255, 0.4);
+  background-color: rgba(176, 176, 176, 0.7);
   -webkit-backdrop-filter: blur(20px);
-  color: #efefef;
+  text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+  color: #fff;
   font-family: 'Comfortaa','Skyhook Mono', 'Monoxil', Helvetica Neue;
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 13px;
@@ -94,6 +95,23 @@ export const command = (dispatch) => {
           .text((response) => response.text())
           .then((str) =>
             new window.DOMParser().parseFromString(str, "text/xml")
+          )
+          .then((data) => {
+            const result = {
+              statusCode: 200,
+              buy: Bank.transformation.buyRate(data),
+              sell: Bank.transformation.sellRate(data),
+              date: Bank.transformation.date(data),
+            };
+            dispatch({
+              type: "FETCH_SUCCEDED",
+              data: result,
+            });
+          });
+      } else if (Bank.isHtml === true) {
+        response.text((response) => response.text())
+          .then((str) =>
+            new window.DOMParser().parseFromString(str, "text/html")
           )
           .then((data) => {
             const result = {

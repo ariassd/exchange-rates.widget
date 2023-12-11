@@ -22,7 +22,7 @@ const dropdown = css({
       display: "block",
     },
     ".dropbtn": {
-      backgroundColor: "#3e8e41",
+      backgroundColor: "#e6e6e6",
     },
   },
 });
@@ -33,7 +33,7 @@ const dropdownContent = css({
   bottom: "-23px",
   left: "15px",
   height: "46px",
-  backgroundColor: "rgba(255, 255, 255, 0.8)",
+  backgroundColor: "rgba(255, 255, 255, 0.9)",
   borderRadius: "13px",
   border: "solid 1px #fff",
   minWidth: "320px",
