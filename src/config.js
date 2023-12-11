@@ -1,5 +1,5 @@
 export const Config = {
-  show: ["suap", "coopenae","mutual", "coopealianza","bcr", "bct", "bac" ],
+  show: ["suap", "coopenae", "bccr", "mutual", "coopealianza","bcr", "bct", "bac" ],
   defaultBrowser: "open -a Google\\ Chrome.app",
   banks: [
     {
@@ -17,6 +17,26 @@ export const Config = {
         },
         sellRate: (data) => {
           const sell = data.getElementById("tc-venta").innerHTML;
+          return +sell
+        },
+        date: (data) => new Date(),
+      },
+    },
+    {
+      name: "bccr",
+      shortName: "bccr",
+      bankCode: 100,
+      pict: "/exchange-rates.widget/assets/bccr.png",
+      url: "https://www.bccr.fi.cr/SitePages/Inicio.aspx",
+      web: "https://www.bccr.fi.cr/SitePages/Inicio.aspx",
+      isHtml: true,
+      transformation: {
+        buyRate: (data) => {
+          const buy = data.getElementById("D317").innerHTML.replace(/,/ig, '.').replace(/₡|\s/ig, '');
+          return +buy
+        },
+        sellRate: (data) => {
+          const sell = data.getElementById("D318").innerHTML.replace(/,/ig, '.').replace(/₡|\s/ig, '');
           return +sell
         },
         date: (data) => new Date(),
