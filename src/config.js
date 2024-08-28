@@ -1,27 +1,7 @@
 export const Config = {
-  show: ["suap", "coopenae", "bccr", "mutual", "coopealianza","bcr", "bct", "bac" ],
+  show: ["coopenae", "mutual", "coopealianza" ,"bccr","bcr", "bct", "bac" ],
   defaultBrowser: "open -a Google\\ Chrome.app",
   banks: [
-    {
-      name: "suap",
-      shortName: "sp",
-      bankCode: 1200,
-      pict: "/exchange-rates.widget/assets/suap.png",
-      url: "https://suap.cr",
-      web: "https://suap.cr",
-      isHtml: true,
-      transformation: {
-        buyRate: (data) => {
-          const buy = data.getElementById("tc-compra").innerHTML;
-          return +buy
-        },
-        sellRate: (data) => {
-          const sell = data.getElementById("tc-venta").innerHTML;
-          return +sell
-        },
-        date: (data) => new Date(),
-      },
-    },
     {
       name: "bccr",
       shortName: "bccr",
@@ -75,6 +55,7 @@ export const Config = {
       pict: "/exchange-rates.widget/assets/coopealianza.png",
       url: "https://coopealianza.fi.cr/tipo-cambio/consulta_tc.php",
       web: "https://web.coopealianza.fi.cr/Administration.WebUI/Pages/General/Login.aspx",
+      method: "post",
       transformation: {
         buyRate: (data) => +data.tc_compra,
         sellRate: (data) => +data.tc_venta,
@@ -141,6 +122,66 @@ export const Config = {
         date: (data) => new Date(),
       },
     },
-    
+    // {
+    //   name: "aribot",
+    //   shortName: "ab",
+    //   bankCode: 5800,
+    //   pict: "/exchange-rates.widget/assets/aribot.png",
+    //   url: "https://www.aribot.ai/_api/v1/access-tokens",
+    //   web: "https://www.aribot.ai/",
+    //   isHtml: true,
+    //   transformation: {
+    //     buyRate: (data) => {
+    //       return new Promise((resolve, reject) => {
+    //         const builtInProxy = "http://127.0.0.1:41417/";
+    //         fetch(`https://www.aribot.ai/_api/wix-code-public-dispatcher-ng/siteview/_webMethods/backend/aModule.jsw/getRandomGreeting.ajax?gridAppId=05e146aa-5180-4aeb-8758-a6dab4af1fee&viewMode=site`)
+    //         .then((response) => {
+    //           {
+    //             response.json().then((data) => {
+    //               const result = {
+    //                 statusCode: 200,
+    //                 buy: Bank.transformation.buyRate(data),
+    //                 sell: Bank.transformation.sellRate(data),
+    //                 date: Bank.transformation.date(data),
+    //               };
+    //               response(result)
+    //             });
+    //           }
+    //         })
+    //         .catch((error) => {
+    //           reject(error );
+    //         });
+    //       })
+          
+    //       const buy = data.getElementById("tc-compra").innerHTML;
+    //       return +buy
+    //     },
+    //     sellRate: (data) => {
+    //       const sell = data.getElementById("tc-venta").innerHTML;
+    //       return +sell
+    //     },
+    //     date: (data) => new Date(),
+    //   },
+    // },
+    // {
+    //   name: "suap",
+    //   shortName: "sp",
+    //   bankCode: 1200,
+    //   pict: "/exchange-rates.widget/assets/suap.png",
+    //   url: "https://suap.cr",
+    //   web: "https://suap.cr",
+    //   isHtml: true,
+    //   transformation: {
+    //     buyRate: (data) => {
+    //       const buy = data.getElementById("tc-compra").innerHTML;
+    //       return +buy
+    //     },
+    //     sellRate: (data) => {
+    //       const sell = data.getElementById("tc-venta").innerHTML;
+    //       return +sell
+    //     },
+    //     date: (data) => new Date(),
+    //   },
+    // }
   ],
 };
