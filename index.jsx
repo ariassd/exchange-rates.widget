@@ -110,7 +110,6 @@ async function getExchange(bank) {
       headers: { 'Content-Type': 'application/json' },
       body: undefined,
     };
-    // console.log(requestConfig)
     fetch(`${builtInProxy}${bank.url}`, requestConfig)
       .then((response) => {
         if (bank.isXml === true) {
@@ -155,7 +154,6 @@ async function getExchange(bank) {
           response
             .json()
             .then((data) => {
-              // console.log('HRE', data)
               const result = {
                 statusCode: 200,
                 buy: bank.transformation.buyRate(data),
@@ -200,7 +198,7 @@ function computeDifference() {
     for (const element of pos0) {
       const before = pos1.find((i) => i.bank === element.bank);
 
-      if (!before.dispatchPayload || element.dispatchPayload) {
+      if (!before.dispatchPayload || !element.dispatchPayload) {
         continue;
       }
 
@@ -226,22 +224,14 @@ function computeDifference() {
 // this should be called command to be executed automatically
 export const command = async (dispatch) => {
   const storeData = [];
-
   console.log('...loading values');
-  let displayed = undefined;
-
   for (const bk of Config.banks) {
     try {
-      // console.log(bk.name);
       const ex = await getExchange(bk);
-      // const ex = await getExchange(Bank);
       storeData.push({ bank: bk.name, dispatchPayload: ex });
-      if (bk.name == Bank.name) {
-        displayed = ex;
-      }
     } catch (e) {
-      storeData.push({ bank: bk.name, dispatchPayload: undefined });
       console.log(bk.name, e);
+      storeData.push({ bank: bk.name, dispatchPayload: undefined });
     }
   }
 
@@ -251,9 +241,7 @@ export const command = async (dispatch) => {
   localStorage.setItem('exchanges-0', JSON.stringify(storeData));
 
   const priceMovement = computeDifference();
-  displayed = { ...priceMovement.dispatchPayload, priceMovement };
-
-  //  console.log('displayed', displayed)
+  const displayed = { ...priceMovement.dispatchPayload, priceMovement };
 
   dispatch(displayed);
 };
@@ -264,7 +252,8 @@ export const changeDisplayBank = async () => {
   return displayed;
 };
 
-export const updateStateReducer = (event, previousState) => {
+// This is the reducer, the name should be updateState
+export const updateState = (event, previousState) => {
   switch (event.type) {
     case 'FETCH_SUCCEDED':
       return { ...previousState, data: event.data, priceMovement: event.priceMovement };
@@ -277,7 +266,7 @@ export const updateStateReducer = (event, previousState) => {
 };
 
 const Main = (input) => {
-  const [state, dispatch] = React.useReducer(updateStateReducer, { output: '' });
+  const [state, dispatch] = React.useReducer(updateState, { output: '' });
   const [selectedBank, setSelectedBank] = React.useState(Bank);
   const [data, setData] = React.useState();
   const [priceMovementClassName, setPriceMovementClassName] = React.useState(stable);
@@ -304,8 +293,8 @@ const Main = (input) => {
     setSelectedBank(Bank);
   };
 
-  const onRefresh = () => {
-    command(dispatch);
+  const onRefresh = async () => {
+    await command(dispatch);
   };
 
   return (
