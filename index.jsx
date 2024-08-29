@@ -100,7 +100,7 @@ const stable = css({});
 var Bank = Config.banks.find((i) => i.name === Config.show[0]);
 
 // the refresh frequency in milliseconds
-export const refreshFrequency = 300000;
+export const refreshFrequency = 300000; // 30 seconds
 const builtInProxy = 'http://127.0.0.1:41417/';
 
 async function getExchange(bank) {
@@ -258,13 +258,13 @@ export const command = async (dispatch) => {
   dispatch(displayed);
 };
 
-export const command2 = async () => {
+export const changeDisplayBank = async () => {
   const priceMovement = computeDifference();
   const displayed = { ...priceMovement.dispatchPayload, priceMovement };
   return displayed;
 };
 
-export const updateState = (event, previousState) => {
+export const updateStateReducer = (event, previousState) => {
   switch (event.type) {
     case 'FETCH_SUCCEDED':
       return { ...previousState, data: event.data, priceMovement: event.priceMovement };
@@ -277,12 +277,13 @@ export const updateState = (event, previousState) => {
 };
 
 const Main = (input) => {
+  const [state, dispatch] = React.useReducer(updateStateReducer, { output: '' });
   const [selectedBank, setSelectedBank] = React.useState(Bank);
   const [data, setData] = React.useState();
   const [priceMovementClassName, setPriceMovementClassName] = React.useState(stable);
 
   React.useEffect(() => {
-    command2().then((data) => {
+    changeDisplayBank().then((data) => {
       setData(data.data);
       setPriceMovementClassName(stable);
       if (data?.priceMovement?.movement == 'up') {
@@ -303,9 +304,18 @@ const Main = (input) => {
     setSelectedBank(Bank);
   };
 
+  const onRefresh = () => {
+    command(dispatch);
+  };
+
   return (
     <div className={priceMovementClassName}>
-      <Exchange data={data} bank={selectedBank} onBankChange={onBankChangeHandler} />
+      <Exchange
+        data={data}
+        bank={selectedBank}
+        onBankChange={onBankChangeHandler}
+        onRefresh={onRefresh}
+      />
     </div>
   );
 };

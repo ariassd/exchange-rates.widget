@@ -1,19 +1,34 @@
 import { React } from 'uebersicht';
-import { run } from 'uebersicht';
+import { run, css } from 'uebersicht';
 
 import { About } from './about.jsx';
 import { Dropdown } from '../components/dropdown.jsx';
 import { Config } from '../config';
 
-const Exchange = ({ data, bank, onBankChange }) => {
+const refreshButton = css({
+  position: 'absolute',
+  right: 0,
+  // border: '1px solid #fff',
+  with: '20px',
+  height: '20px',
+  borderRadius: '50px',
+});
+
+const Exchange = ({ data, bank, onBankChange, onRefresh }) => {
   const [selectedBank, setSelectedBank] = React.useState('');
   const handleChange = (e) => {
     setSelectedBank(e.value);
     onBankChange(e.value);
   };
+  const handleRefresh = (e) => {
+    onRefresh();
+  };
 
   return (
     <div>
+      <div className={refreshButton} onClick={() => handleRefresh()}>
+        <img src="/exchange-rates.widget/assets/refresh.png" width="20px"></img>
+      </div>
       <table className="table-container">
         <tbody>
           <tr>
@@ -73,6 +88,7 @@ const Exchange = ({ data, bank, onBankChange }) => {
           </tr>
         </tbody>
       </table>
+
       <About />
     </div>
   );
