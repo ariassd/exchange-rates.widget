@@ -97,7 +97,10 @@ const down = css({
 });
 const stable = css({});
 
-var Bank = Config.banks.find((i) => i.name === Config.show[0]);
+var Bank = JSON.parse(localStorage.getItem('selected-bank'));
+if (!Bank?.name) {
+  Bank = Config.banks.find((i) => i.name === Config.show[0]);
+}
 
 // the refresh frequency in milliseconds
 export const refreshFrequency = 300000; // 30 seconds
@@ -290,6 +293,7 @@ const Main = (input) => {
 
   const onBankChangeHandler = (bank) => {
     Bank = Config.banks.find((i) => i.name === bank);
+    localStorage.setItem('selected-bank', JSON.stringify(Bank));
     setSelectedBank(Bank);
   };
 
