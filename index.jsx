@@ -1,7 +1,7 @@
-import { React } from "uebersicht";
-import { Exchange } from "./src/pages/exchange.jsx";
-import { Config } from "./src/config";
-import { css } from 'uebersicht'
+import { React } from 'uebersicht';
+import { Exchange } from './src/pages/exchange.jsx';
+import { Config } from './src/config';
+import { css } from 'uebersicht';
 
 export const className = `
   position: fixed;
@@ -82,191 +82,193 @@ export const className = `
 `;
 
 const up = css({
-  backgroundColor: "rgba(18, 255, 18, 0.4) !important",
+  backgroundColor: 'rgba(18, 255, 18, 0.4) !important',
   width: '400px',
   height: '50px;',
   position: 'fixed',
-  borderRadius: '13px'
+  borderRadius: '13px',
 });
 const down = css({
-  backgroundColor: "rgba(250, 57, 57, 0.4) !important",
+  backgroundColor: 'rgba(250, 57, 57, 0.4) !important',
   width: '400px',
   height: '50px;',
   position: 'fixed',
-  borderRadius: '13px'
+  borderRadius: '13px',
 });
 const stable = css({});
-
 
 var Bank = Config.banks.find((i) => i.name === Config.show[0]);
 
 // the refresh frequency in milliseconds
 export const refreshFrequency = 300000;
-const builtInProxy = "http://127.0.0.1:41417/";
+const builtInProxy = 'http://127.0.0.1:41417/';
 
-export const command2 = async (dispatch) => {
+async function getExchange(bank) {
+  return new Promise((resolve, reject) => {
+    const requestConfig = {
+      method: bank.method?.toLowerCase() || 'get',
+      headers: { 'Content-Type': 'application/json' },
+      body: undefined,
+    };
+    // console.log(requestConfig)
+    fetch(`${builtInProxy}${bank.url}`, requestConfig)
+      .then((response) => {
+        if (bank.isXml === true) {
+          response
+            .text((response) => response.text())
+            .then((str) => new window.DOMParser().parseFromString(str, 'text/xml'))
+            .then((data) => {
+              const result = {
+                statusCode: 200,
+                buy: bank.transformation.buyRate(data),
+                sell: bank.transformation.sellRate(data),
+                date: bank.transformation.date(data),
+              };
+              resolve({
+                type: 'FETCH_SUCCEDED',
+                data: result,
+              });
+            })
+            .catch((e) => {
+              reject(`Error getting ${bank.name}: ${e}`);
+            });
+        } else if (bank.isHtml === true) {
+          response
+            .text((response) => response.text())
+            .then((str) => new window.DOMParser().parseFromString(str, 'text/html'))
+            .then((data) => {
+              const result = {
+                statusCode: 200,
+                buy: bank.transformation.buyRate(data),
+                sell: bank.transformation.sellRate(data),
+                date: bank.transformation.date(data),
+              };
+              resolve({
+                type: 'FETCH_SUCCEDED',
+                data: result,
+              });
+            })
+            .catch((e) => {
+              reject(`Error getting ${bank.name}: ${e}`);
+            });
+        } else {
+          response
+            .json()
+            .then((data) => {
+              // console.log('HRE', data)
+              const result = {
+                statusCode: 200,
+                buy: bank.transformation.buyRate(data),
+                sell: bank.transformation.sellRate(data),
+                date: bank.transformation.date(data),
+              };
+              resolve({
+                type: 'FETCH_SUCCEDED',
+                data: result,
+              });
+            })
+            .catch((e) => {
+              reject(`Error getting ${bank.name}: ${e}`);
+            });
+        }
+      })
+      .catch((error) => {
+        const result = {
+          statusCode: 500,
+          buy: 0,
+          sell: 0,
+          date: new Date(),
+        };
+        resolve({ type: 'FETCH_FAILED', error: error, data: result });
+      });
+  });
+}
 
-  const storeData = []
-  // const ex = await getExchange(Bank);
-  // dispatch(ex);
+// this method will compare results to detect if the value is up or down
+function computeDifference() {
+  const pos0 = JSON.parse(localStorage.getItem('exchanges-0'));
+  const pos1 = JSON.parse(localStorage.getItem('exchanges-1'));
 
-  // storeData.push({ bank: bk.name, values: ex });
-  // console.log(ex)
+  const defaultBank = pos0.find((i) => i.bank == Bank.name);
+  let result = {
+    movement: 'stable',
+    bank: defaultBank.bank,
+    dispatchPayload: defaultBank.dispatchPayload,
+  };
 
+  if (pos0 && pos1) {
+    for (const element of pos0) {
+      const before = pos1.find((i) => i.bank === element.bank);
 
-  // const priceMovement = computeDifference();
-  // console.log(priceMovement);
+      if (!before.dispatchPayload || element.dispatchPayload) {
+        continue;
+      }
 
-  // return
+      if (before.dispatchPayload.data.sell > element.dispatchPayload.data.sell) {
+        result.bank = element.bank;
+        result.dispatchPayload = element.dispatchPayload;
+        result.movement = 'down';
+        result.message = `Sell pricing is down in '${element.bank}'`;
+        break;
+      }
+      if (before.dispatchPayload.data.sell < element.dispatchPayload.data.sell) {
+        result.bank = element.bank;
+        result.dispatchPayload = element.dispatchPayload;
+        result.movement = 'up';
+        result.message = `Sell pricing is up in '${element.bank}'`;
+        break;
+      }
+    }
+  }
+  return result;
+}
 
-  localStorage.setItem("exchanges-2", localStorage.getItem('exchanges-1'));
-  localStorage.setItem("exchanges-1", localStorage.getItem('exchanges-0'));
-  localStorage.setItem("exchanges-0", null);
+// this should be called command to be executed automatically
+export const command = async (dispatch) => {
+  const storeData = [];
 
+  console.log('...loading values');
   let displayed = undefined;
 
   for (const bk of Config.banks) {
     try {
-      // console.log(bk.name)
+      // console.log(bk.name);
       const ex = await getExchange(bk);
       // const ex = await getExchange(Bank);
-      storeData.push({ bank: bk.name, values: ex.data });
+      storeData.push({ bank: bk.name, dispatchPayload: ex });
       if (bk.name == Bank.name) {
         displayed = ex;
-        
       }
     } catch (e) {
+      storeData.push({ bank: bk.name, dispatchPayload: undefined });
       console.log(bk.name, e);
     }
   }
-  localStorage.setItem("exchanges-0", JSON.stringify(storeData));
+
+  console.log('...values loaded');
+  localStorage.setItem('exchanges-2', localStorage.getItem('exchanges-1'));
+  localStorage.setItem('exchanges-1', localStorage.getItem('exchanges-0'));
+  localStorage.setItem('exchanges-0', JSON.stringify(storeData));
 
   const priceMovement = computeDifference();
-  displayed = { ...displayed, priceMovement }
-  
+  displayed = { ...priceMovement.dispatchPayload, priceMovement };
+
   //  console.log('displayed', displayed)
 
   dispatch(displayed);
+};
 
-  // this method will compare results to detect if the value is up or down
-  function computeDifference() {
-    const pos0 = JSON.parse(localStorage.getItem('exchanges-0'));
-    const pos1 = JSON.parse(localStorage.getItem('exchanges-1'));
-
-    let result = {
-      movement: "stable",
-      bank: ""
-    }
-  
-    if (pos0 && pos1) {
-      for (const element of pos0) {
-        // console.log(element.bank)
-        const before = pos1.find(i => i.bank === element.bank);
-        if (before.values.sell > element.values.sell) {
-          result = {
-            movement: "down",
-            message: `Sell pricing is down in '${element.bank}'`,
-            bank: element.bank
-          }
-          break;
-        }
-        if (before.values.sell < element.values.sell) {
-          result = {
-            movement: "up",
-            message: `Sell pricing is up in '${element.bank}'`,
-            bank: element.bank
-          }
-          break;
-        }
-      }
-    }
-    return result;
-  }
-
-  async function getExchange(bank) {
-    return new Promise((resolve, reject) => {
-      const requestConfig = {
-        method: bank.method?.toLowerCase() || "get",
-        headers: { 'Content-Type': 'application/json' },
-        body: undefined
-      };
-      // console.log(requestConfig)
-      fetch(`${builtInProxy}${bank.url}`, requestConfig)
-        .then((response) => {
-            if (bank.isXml === true) {
-              response
-                .text((response) => response.text())
-                .then((str) =>
-                  new window.DOMParser().parseFromString(str, "text/xml")
-                )
-                .then((data) => {
-                  const result = {
-                    statusCode: 200,
-                    buy: bank.transformation.buyRate(data),
-                    sell: bank.transformation.sellRate(data),
-                    date: bank.transformation.date(data),
-                  };
-                  resolve({
-                    type: "FETCH_SUCCEDED",
-                    data: result,
-                  });
-                });
-            } else if (bank.isHtml === true) {
-              response.text((response) => response.text())
-                .then((str) =>
-                  new window.DOMParser().parseFromString(str, "text/html")
-                )
-                .then((data) => {
-                  const result = {
-                    statusCode: 200,
-                    buy: bank.transformation.buyRate(data),
-                    sell: bank.transformation.sellRate(data),
-                    date: bank.transformation.date(data),
-                  };
-                  resolve({
-                    type: "FETCH_SUCCEDED",
-                    data: result,
-                  });
-                });
-            } else {
-              response.json().then((data) => {
-                // console.log('HRE', data)
-                const result = {
-                  statusCode: 200,
-                  buy: bank.transformation.buyRate(data),
-                  sell: bank.transformation.sellRate(data),
-                  date: bank.transformation.date(data),
-                };
-                resolve({
-                  type: "FETCH_SUCCEDED",
-                  data: result,
-                });
-              }).catch(e => {
-                console.log("Error", e);
-              });
-
-            }
-        }).catch((error) => {
-          const result = {
-            statusCode: 500,
-            buy: 0,
-            sell: 0,
-            date: new Date(),
-          };
-          resolve({ type: "FETCH_FAILED", error: error,  data: result })
-        });
-    })
-    
-  }
-
-
+export const command2 = async () => {
+  const priceMovement = computeDifference();
+  const displayed = { ...priceMovement.dispatchPayload, priceMovement };
+  return displayed;
 };
 
 export const updateState = (event, previousState) => {
   switch (event.type) {
-    case "FETCH_SUCCEDED":
+    case 'FETCH_SUCCEDED':
       return { ...previousState, data: event.data, priceMovement: event.priceMovement };
-    case "FETCH_FAILED":
+    case 'FETCH_FAILED':
       return { ...previousState, data: event.data };
     default: {
       return previousState;
@@ -279,19 +281,14 @@ const Main = (input) => {
   const [data, setData] = React.useState();
   const [priceMovementClassName, setPriceMovementClassName] = React.useState(stable);
 
-
-  // React.useEffect(() => {
-  //   setSelectedBank(Bank);
-  // }, []);
   React.useEffect(() => {
-    command2((data) => {
+    command2().then((data) => {
       setData(data.data);
-
       setPriceMovementClassName(stable);
-      if (data?.priceMovement?.movement == "up"){
+      if (data?.priceMovement?.movement == 'up') {
         setPriceMovementClassName(up);
       }
-      if (data?.priceMovement?.movement == "down") {
+      if (data?.priceMovement?.movement == 'down') {
         setPriceMovementClassName(down);
       }
     });
@@ -307,14 +304,9 @@ const Main = (input) => {
   };
 
   return (
-    <div className={ priceMovementClassName }>
-      <Exchange
-        data={data}
-        bank={selectedBank}
-        onBankChange={onBankChangeHandler}
-      />
+    <div className={priceMovementClassName}>
+      <Exchange data={data} bank={selectedBank} onBankChange={onBankChangeHandler} />
     </div>
-     
   );
 };
 
