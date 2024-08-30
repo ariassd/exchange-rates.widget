@@ -1,7 +1,7 @@
-import { React } from 'uebersicht';
+import { React, css, run } from 'uebersicht';
+import * as ubs from 'uebersicht';
 import { Exchange } from './src/pages/exchange.jsx';
 import { Config } from './src/config';
-import { css } from 'uebersicht';
 
 export const className = `
   position: fixed;
@@ -96,6 +96,15 @@ const down = css({
   borderRadius: '13px',
 });
 const stable = css({});
+
+const loading = css({
+  backgroundColor: 'rgba(0, 253, 8 , 0.9) !important',
+  width: '0px',
+  height: '5px;',
+  position: 'fixed',
+  bottom: '5px',
+  borderRadius: '50px',
+});
 
 var Bank = JSON.parse(localStorage.getItem('selected-bank'));
 if (!Bank?.name) {
@@ -224,11 +233,24 @@ function computeDifference() {
   return result;
 }
 
+function refreshWidget() {
+  // prettier-ignore
+  run(`osascript -e 'tell application id "tracesOf.Uebersicht" to refresh widget id "exchange-rates-widget-index-jsx"'`);
+  // Try this later
+  // fetch('http://127.0.0.1:41416/refresh-widget?id=exchange-rates-widget-index-jsx')
+}
+
 // this should be called command to be executed automatically
 export const command = async (dispatch) => {
   const storeData = [];
   console.log('...loading values');
+  let position = 0;
   for (const bk of Config.banks) {
+    position++;
+    dispatch({
+      type: 'PROGRESS_BAR',
+      progress: Number.parseInt((position / Config.banks.length) * 100),
+    });
     try {
       const ex = await getExchange(bk);
       storeData.push({ bank: bk.name, dispatchPayload: ex });
@@ -246,6 +268,8 @@ export const command = async (dispatch) => {
   const priceMovement = computeDifference();
   const displayed = { ...priceMovement.dispatchPayload, priceMovement };
 
+  dispatch({ type: 'PROGRESS_BAR', progress: 0 });
+
   dispatch(displayed);
 };
 
@@ -262,17 +286,24 @@ export const updateState = (event, previousState) => {
       return { ...previousState, data: event.data, priceMovement: event.priceMovement };
     case 'FETCH_FAILED':
       return { ...previousState, data: event.data };
+    case 'PROGRESS_BAR':
+      return { ...previousState, progress: event.progress };
     default: {
       return previousState;
     }
   }
 };
 
-const Main = (input) => {
-  const [state, dispatch] = React.useReducer(updateState, { output: '' });
+const Main = (props) => {
+  const [state, dispatch] = React.useReducer(updateState, { output: {} });
   const [selectedBank, setSelectedBank] = React.useState(Bank);
   const [data, setData] = React.useState();
+  const [progressBar, setProgressBar] = React.useState('0%');
   const [priceMovementClassName, setPriceMovementClassName] = React.useState(stable);
+
+  React.useEffect(() => {
+    setProgressBar(`${props.progress}%`);
+  }, [props.progress]);
 
   React.useEffect(() => {
     changeDisplayBank().then((data) => {
@@ -288,8 +319,8 @@ const Main = (input) => {
   }, [selectedBank]);
 
   React.useEffect(() => {
-    setData(input.data);
-  }, [input]);
+    setData(props.data?.data);
+  }, [props.data?.data]);
 
   const onBankChangeHandler = (bank) => {
     Bank = Config.banks.find((i) => i.name === bank);
@@ -298,7 +329,8 @@ const Main = (input) => {
   };
 
   const onRefresh = async () => {
-    await command(dispatch);
+    // window.location.reload(); // <- reload all widgets
+    refreshWidget();
   };
 
   return (
@@ -309,12 +341,13 @@ const Main = (input) => {
         onBankChange={onBankChangeHandler}
         onRefresh={onRefresh}
       />
+      <div className={loading} style={{ width: progressBar }}></div>
     </div>
   );
 };
 
-const render = ({ data }) => {
-  return <Main data={data} />;
+const render = (payload) => {
+  return <Main {...payload} />;
 };
 
 export { render };

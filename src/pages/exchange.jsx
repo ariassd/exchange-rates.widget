@@ -8,10 +8,10 @@ import { Config } from '../config';
 const refreshButton = css({
   position: 'absolute',
   right: 0,
-  // border: '1px solid #fff',
   with: '20px',
   height: '20px',
   borderRadius: '50px',
+  cursor: 'pointer',
 });
 
 const Exchange = ({ data, bank, onBankChange, onRefresh }) => {
